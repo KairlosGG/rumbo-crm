@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --color-fondo: #f5f5f2;
+  --color-superficie: #ffffff;
+  --color-hundido: #efefeb;
+  --color-tinta: #15171c;
+  --color-suave: #61666f;
+  --color-tenue: #9096a0;
+  --color-linea: #e6e5e0;
+  --color-marca: #0d7a68;
+  --color-marca-oscura: #08594c;
+  --color-marca-clara: #e2f2ee;
+  --color-ia: #6a4fd6;
+  --color-ia-clara: #eeeafd;
+  --color-ambar: #b9760c;
+  --color-ambar-clara: #fcf1dc;
+  --color-rojo: #b9483e;
+  --color-rojo-claro: #fbe9e6;
+
+  --shadow-tarjeta: 0 1px 2px rgb(21 23 28 / 0.05), 0 1px 1px rgb(21 23 28 / 0.03);
+  --shadow-elevada: 0 2px 6px rgb(21 23 28 / 0.06), 0 16px 40px -12px rgb(21 23 28 / 0.25);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-fondo);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+.cifras {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-marca);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.sin-barra::-webkit-scrollbar {
+  display: none;
+}
+.sin-barra {
+  scrollbar-width: none;
+}
+
+@keyframes destello {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.cargando {
+  background: linear-gradient(90deg, var(--color-hundido) 0%, #f9f9f7 50%, var(--color-hundido) 100%);
+  background-size: 200% 100%;
+  animation: destello 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
