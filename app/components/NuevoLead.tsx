@@ -60,8 +60,8 @@ export default function NuevoLead() {
 
   const guardar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!f.empresa.trim() || !f.nombre.trim()) {
-      setError("Indica al menos la empresa y el nombre del contacto.");
+    if (!f.empresa.trim()) {
+      setError("Indica al menos el nombre de la empresa.");
       return;
     }
     if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
@@ -107,9 +107,9 @@ export default function NuevoLead() {
             initial={{ y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}
-            className="relative max-h-[92dvh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-superficie p-5 shadow-elevada sm:rounded-3xl sm:p-7"
+            className="relative flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl bg-superficie shadow-elevada sm:rounded-3xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 border-b border-linea px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
               <div>
                 <h2 id="titulo-nuevo" className="text-xl font-extrabold tracking-tight">
                   Nuevo lead
@@ -123,7 +123,8 @@ export default function NuevoLead() {
               </button>
             </div>
 
-            <button type="button" onClick={() => setF(EJEMPLO)} className="mt-3 text-xs font-bold text-ia hover:underline">
+            <div className="desplazable min-h-0 flex-1 overflow-y-auto px-5 pb-5 sm:px-7">
+            <button type="button" onClick={() => setF(EJEMPLO)} className="mt-4 text-xs font-bold text-ia hover:underline">
               Rellenar con un ejemplo
             </button>
 
@@ -161,8 +162,8 @@ export default function NuevoLead() {
 
             <fieldset className="mt-5 grid min-w-0 gap-3 sm:grid-cols-3">
               <legend className="mb-2 text-xs font-bold uppercase tracking-wider text-tenue">Contacto</legend>
-              <Campo etiqueta="Nombre *">
-                <input className={campo} {...c("nombre")} required />
+              <Campo etiqueta="Nombre">
+                <input className={campo} {...c("nombre")} placeholder="Opcional" />
               </Campo>
               <Campo etiqueta="Cargo">
                 <input className={campo} {...c("cargo")} />
@@ -210,8 +211,9 @@ export default function NuevoLead() {
             )}
 
             <p className="mt-4 text-xs text-tenue">Es una demo: usa datos inventados, no de personas reales.</p>
+            </div>
 
-            <div className="sticky -bottom-5 -mx-5 mt-5 flex justify-end gap-2 border-t border-linea bg-superficie px-5 py-3 sm:-bottom-7 sm:-mx-7 sm:px-7">
+            <div className="flex justify-end gap-2 border-t border-linea px-5 py-3 sm:px-7">
               <button type="button" onClick={cerrar} className={boton.secundario}>
                 Cancelar
               </button>

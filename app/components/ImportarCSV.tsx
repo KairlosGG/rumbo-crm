@@ -177,8 +177,9 @@ export default function ImportarCSV({ abierto, onCerrar }: { abierto: boolean; o
             initial={{ y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}
-            className="relative max-h-[92dvh] w-full max-w-3xl overflow-y-auto rounded-t-3xl bg-superficie p-5 shadow-elevada sm:rounded-3xl sm:p-7"
+            className="relative w-full max-w-3xl overflow-hidden rounded-t-3xl bg-superficie shadow-elevada sm:rounded-3xl"
           >
+            <div className="desplazable max-h-[92dvh] overflow-y-auto p-5 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 id="titulo-importar" className="flex items-center gap-2 text-xl font-extrabold tracking-tight">
@@ -295,6 +296,7 @@ export default function ImportarCSV({ abierto, onCerrar }: { abierto: boolean; o
                 </div>
               </div>
             )}
+            </div>
           </motion.div>
         </motion.div>
       )}

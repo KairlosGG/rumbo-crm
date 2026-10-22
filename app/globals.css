@@ -29,6 +29,11 @@
   color-scheme: light;
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #d6d4cc transparent;
+}
+
 html,
 body {
   background: var(--color-fondo);
@@ -46,6 +51,28 @@ body {
   outline: 2px solid var(--color-marca);
   outline-offset: 2px;
   border-radius: 8px;
+}
+
+/* Barra de desplazamiento fina, separada de las esquinas redondeadas */
+.desplazable {
+  scrollbar-width: thin;
+  scrollbar-color: #d6d4cc transparent;
+}
+.desplazable::-webkit-scrollbar {
+  width: 10px;
+}
+.desplazable::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 12px 0;
+}
+.desplazable::-webkit-scrollbar-thumb {
+  background: #d6d4cc;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.desplazable::-webkit-scrollbar-thumb:hover {
+  background-color: #b9b6ac;
 }
 
 .sin-barra::-webkit-scrollbar {

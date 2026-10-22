@@ -61,7 +61,7 @@ export default function Aprobaciones() {
                           <span className="text-xs text-tenue">{hace(b.fecha)}</span>
                         </div>
                         <p className="truncate text-xs text-suave">
-                          Para {l.contacto.nombre} · {producto(l.recomendacion?.productoId ?? "")?.nombre ?? "Sin recomendación"}
+                          Para {l.contacto.nombre || "el contacto por identificar"} · {producto(l.recomendacion?.productoId ?? "")?.nombre ?? "Sin recomendación"}
                         </p>
                         <p className="mt-2 text-sm font-bold">{b.asunto}</p>
                         <button

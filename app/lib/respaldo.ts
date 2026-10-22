@@ -58,7 +58,7 @@ export function recomendarSinIA(lead: Lead): Recomendacion {
 export function redactarSinIA(lead: Lead, ajustes: Ajustes): Omit<Borrador, "estado" | "editado"> {
   const p = producto(lead.recomendacion?.productoId ?? "turnos")!;
   const nombre = lead.contacto.nombre.split(" ")[0] || "";
-  const saludo = ajustes.tono === "formal" ? `Estimado/a ${lead.contacto.nombre}:` : `Hola, ${nombre}:`;
+  const saludo = !nombre ? (ajustes.tono === "formal" ? "Buenos días:" : "Hola:") : ajustes.tono === "formal" ? `Estimado/a ${lead.contacto.nombre}:` : `Hola, ${nombre}:`;
   const gancho = lead.necesidad
     ? `Me quedé con lo que comentabais: «${lead.necesidad}».`
     : `Trabajamos con varias empresas de ${lead.sector.toLowerCase()} con retos parecidos a los vuestros.`;

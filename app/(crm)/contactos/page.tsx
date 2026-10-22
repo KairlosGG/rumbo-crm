@@ -16,6 +16,7 @@ export default function Contactos() {
   const filas = useMemo(
     () =>
       leads
+        .filter((l) => l.contacto.nombre.trim())
         .filter((l) => !q.trim() || `${l.contacto.nombre} ${l.contacto.cargo} ${l.empresa}`.toLowerCase().includes(q.toLowerCase()))
         .sort((a, b) => a.contacto.nombre.localeCompare(b.contacto.nombre, "es")),
     [leads, q]

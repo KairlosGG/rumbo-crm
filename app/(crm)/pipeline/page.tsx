@@ -36,7 +36,8 @@ function TarjetaLead({ lead, ajustes, arrastrando = false }: { lead: Lead; ajust
             {lead.empresa}
           </Link>
           <p className="truncate text-xs text-suave">
-            {lead.contacto.nombre} · {lead.contacto.cargo}
+            {lead.contacto.nombre || "Sin contacto"}
+            {lead.contacto.cargo ? ` · ${lead.contacto.cargo}` : ""}
           </p>
         </div>
         <PuntuacionAnillo p={p} tamano={34} />

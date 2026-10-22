@@ -125,7 +125,7 @@ function Email({ lead }: { lead: Lead }) {
       </label>
       <label className="mt-3 block">
         <span className="mb-1 flex justify-between text-xs font-bold text-suave">
-          Mensaje para {lead.contacto.nombre} <span className="font-semibold text-tenue">{lead.contacto.email}</span>
+          Mensaje para {lead.contacto.nombre || "el contacto"} <span className="font-semibold text-tenue">{lead.contacto.email}</span>
         </span>
         <textarea
           className={`${campo} min-h-[220px] leading-relaxed`}
@@ -303,7 +303,7 @@ export default function FichaLead({ params }: { params: Promise<{ id: string }> 
 
           <Tarjeta className="p-5">
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold">Mapa de empatía de {lead.contacto.nombre.split(" ")[0]}</h2>
+              <h2 className="font-extrabold">Mapa de empatía {lead.contacto.nombre ? `de ${lead.contacto.nombre.split(" ")[0]}` : "del contacto"}</h2>
               {mapa && <OrigenTag origen={mapa.origen} />}
             </div>
             {mapa ? (
@@ -462,7 +462,7 @@ export default function FichaLead({ params }: { params: Promise<{ id: string }> 
             <div className="mt-3 flex items-center gap-3">
               <Iniciales nombre={lead.contacto.nombre} className="h-10 w-10 text-sm" />
               <div className="min-w-0">
-                <p className="truncate font-bold">{lead.contacto.nombre}</p>
+                <p className="truncate font-bold">{lead.contacto.nombre || "Contacto por identificar"}</p>
                 <p className="truncate text-xs text-suave">{lead.contacto.cargo}</p>
                 {lead.contacto.email && <p className="truncate text-xs text-marca">{lead.contacto.email}</p>}
               </div>

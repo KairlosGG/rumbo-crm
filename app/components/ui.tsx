@@ -33,7 +33,7 @@ export function Logo({ className = "h-7 w-7" }: { className?: string }) {
 }
 
 export function Iniciales({ nombre, className = "h-8 w-8 text-xs" }: { nombre: string; className?: string }) {
-  const ini = nombre
+  const ini = (nombre.trim() || "?")
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
