@@ -6,7 +6,7 @@ import { AlertTriangle, Download, FileUp, Info, X } from "lucide-react";
 import { DOLENCIAS } from "../lib/catalogo";
 import { useCRM, type DatosLead } from "../lib/store";
 import type { Tamano } from "../lib/tipos";
-import { boton, campoBase, useEscape } from "./ui";
+import { boton, campoBase, useEscape, useFocoDialogo } from "./ui";
 
 // Importación de leads desde CSV (exportado de Excel, Google Sheets u otro CRM), con mapeo de columnas y validación.
 
@@ -164,6 +164,7 @@ export default function ImportarCSV({ abierto, onCerrar }: { abierto: boolean; o
   };
 
   useEscape(abierto, cerrar);
+  const dialogo = useFocoDialogo<HTMLDivElement>(abierto);
 
   return (
     <AnimatePresence>
@@ -171,6 +172,7 @@ export default function ImportarCSV({ abierto, onCerrar }: { abierto: boolean; o
         <motion.div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-tinta/30 backdrop-blur-[2px]" onClick={cerrar} />
           <motion.div
+            ref={dialogo}
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-importar"

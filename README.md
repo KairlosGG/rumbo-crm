@@ -17,7 +17,16 @@ En prospección B2B, el comercial pierde la mayor parte del tiempo antes de habl
 - **Puntuación y probabilidad explicables.** El encaje se calcula con reglas transparentes (sector, tamaño, necesidad, peso del contacto en la decisión y avance) y la probabilidad de cierre parte de la etapa y se ajusta con señales visibles, como el encaje, la inactividad o un paso vencido. Cada punto muestra su motivo, en lugar de una caja negra que el comercial no puede discutir.
 - **Registro auditable.** La actividad de agentes muestra quién hizo qué, si fue con IA, con reglas o una persona, y cuánto tardó. Se exporta a CSV.
 - **IA honesta.** Los agentes no tienen acceso a internet y lo saben: lo que deducen lo presentan como hipótesis. Todo lo generado con IA lleva su etiqueta.
-- **Siempre funciona.** Si no hay clave de API, se agota la cuota o el modelo falla, cada agente tiene una versión con reglas y el flujo continúa.
+- **Siempre funciona.** Si no hay clave de API, se agota la cuota o el modelo falla, el servidor reintenta una vez y, si sigue fallando, cada agente usa su versión con reglas. La ficha y el registro dicen por qué (sin clave, cuota, tiempo agotado o error) para que el comercial sepa si merece la pena reintentar.
+
+## Seguridad y privacidad
+
+- La clave de Gemini solo vive en el servidor (variable `GEMINI_API_KEY`); el navegador nunca la ve.
+- La ruta de la API rechaza peticiones de otros orígenes, cuerpos de más de 20 KB, tareas desconocidas y ráfagas por IP, y corta cada llamada al modelo a los 20 segundos.
+- Cabeceras de seguridad en todas las páginas (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`).
+- Aviso de posible duplicado al crear un lead de una empresa que ya existe.
+- Diálogos accesibles: el foco queda dentro, se cierran con Escape y lo devuelven al botón que los abrió.
+- La página «Cómo funciona» explica qué datos salen hacia la IA. La demo usa el nivel gratuito de Gemini, así que solo admite datos ficticios.
 
 ## Funcionalidades
 

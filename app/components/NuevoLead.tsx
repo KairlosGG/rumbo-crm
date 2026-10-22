@@ -8,7 +8,7 @@ import { DOLENCIAS, SECTORES, TAMANOS } from "../lib/catalogo";
 import { ejecutarAgentes } from "../lib/agentes";
 import { useCRM, useUsuario } from "../lib/store";
 import type { Tamano } from "../lib/tipos";
-import { boton, campo, useEscape } from "./ui";
+import { boton, campo, useEscape, useFocoDialogo } from "./ui";
 
 const VACIO = {
   empresa: "",
@@ -48,6 +48,7 @@ export default function NuevoLead() {
   const crear = useCRM((s) => s.crearLead);
   const ejecutarAlCrear = useCRM((s) => s.ajustes.ejecutarAlCrear);
   const usuarios = useCRM((s) => s.usuarios);
+  const leads = useCRM((s) => s.leads);
   const yo = useUsuario();
   const [f, setF] = useState(VACIO);
   const [error, setError] = useState("");
@@ -87,12 +88,16 @@ export default function NuevoLead() {
     if (ejecutarAlCrear) ejecutarAgentes(id);
   };
 
+  const norm = (t: string) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+  const duplicado = f.empresa.trim().length > 2 ? leads.find((l) => norm(l.empresa) === norm(f.empresa)) : undefined;
+
   const c = (k: keyof typeof VACIO) => ({
     value: f[k],
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value }),
   });
 
   useEscape(abierto, cerrar);
+  const dialogo = useFocoDialogo<HTMLFormElement>(abierto);
 
   return (
     <AnimatePresence>
@@ -101,6 +106,7 @@ export default function NuevoLead() {
           <div className="absolute inset-0 bg-tinta/30 backdrop-blur-[2px]" onClick={cerrar} />
           <motion.form
             onSubmit={guardar}
+            ref={dialogo}
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-nuevo"
@@ -203,6 +209,23 @@ export default function NuevoLead() {
                 <textarea className={`${campo} min-h-[56px]`} {...c("notas")} />
               </Campo>
             </fieldset>
+
+            {duplicado && (
+              <p role="status" className="mt-4 rounded-xl bg-ambar-clara px-3 py-2 text-sm font-semibold text-ambar">
+                Ya existe un lead de {duplicado.empresa}.{" "}
+                <button
+                  type="button"
+                  className="underline underline-offset-2"
+                  onClick={() => {
+                    cerrar();
+                    router.push(`/leads/${duplicado.id}`);
+                  }}
+                >
+                  Abrirlo
+                </button>{" "}
+                en lugar de crear otro.
+              </p>
+            )}
 
             {error && (
               <p role="alert" className="mt-4 rounded-xl bg-rojo-claro px-3 py-2 text-sm font-semibold text-rojo">

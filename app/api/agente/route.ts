@@ -120,7 +120,31 @@ Respeta el tono indicado (cercano: tutea; formal: usted).`,
   },
 };
 
+// Margen para el reintento; el límite real lo marca el plan de hosting
+export const maxDuration = 60;
+
+type Motivo = "sin-clave" | "limite" | "cuota" | "tiempo" | "error";
+
+function clasificar(error: unknown): Motivo {
+  const m = motivo(error).toLowerCase();
+  if (m.includes("timeout")) return "tiempo";
+  if (m.includes("429") || m.includes("quota") || m.includes("resource_exhausted") || m.includes("rate")) return "cuota";
+  return "error";
+}
+
+const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function POST(req: Request) {
+  // Solo se aceptan peticiones desde la propia aplicación y de tamaño razonable
+  const origen = req.headers.get("origin");
+  const host = req.headers.get("host");
+  if (origen && host && new URL(origen).host !== host) {
+    return NextResponse.json({ error: "Origen no permitido" }, { status: 403 });
+  }
+  if (Number(req.headers.get("content-length") ?? 0) > 20_000) {
+    return NextResponse.json({ error: "Petición demasiado grande" }, { status: 413 });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -136,11 +160,11 @@ export async function POST(req: Request) {
 
   if (!genAI) {
     console.warn("Rumbo: falta GEMINI_API_KEY, agentes en modo reglas");
-    return NextResponse.json({ modo: "reglas" });
+    return NextResponse.json({ modo: "reglas", motivo: "sin-clave" satisfies Motivo });
   }
   if (!permitirIA(req, 40, "agente")) {
     console.warn("Rumbo: límite de uso de IA alcanzado para este visitante");
-    return NextResponse.json({ modo: "reglas", motivo: "limite" });
+    return NextResponse.json({ modo: "reglas", motivo: "limite" satisfies Motivo });
   }
 
   const peticion = tarea === "prospectar"
@@ -166,10 +190,29 @@ ${tarea === "redactar" ? `Tono: ${texto(a.tono, 10) || "cercano"}. Firma: ${text
     const modelo = genAI.getGenerativeModel({
       model: MODELO,
       systemInstruction: TAREAS[tarea].instrucciones,
-      generationConfig: { responseMimeType: "application/json", responseSchema: TAREAS[tarea].esquema, temperature: tarea === "redactar" ? 0.7 : 0.4 },
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: TAREAS[tarea].esquema,
+        temperature: tarea === "redactar" ? 0.7 : 0.4,
+        // Sin razonamiento extendido: tareas acotadas, respuesta más rápida y barata
+        thinkingConfig: { thinkingBudget: 0 },
+      } as Record<string, unknown>,
     });
-    const r = await conTiempoMaximo(modelo.generateContent(`${contexto}\n\n${lead}`), 25_000);
-    const datos = JSON.parse(r.response.text());
+    const prompt = `${contexto}\n\n${lead}`;
+    let datos: Record<string, unknown> | null = null;
+    // Un reintento si la cuota por minuto o el servicio fallan de forma transitoria
+    for (let intento = 0; intento < 2 && !datos; intento++) {
+      try {
+        const r = await conTiempoMaximo(modelo.generateContent(prompt), 20_000);
+        datos = JSON.parse(r.response.text());
+      } catch (e) {
+        const tipo = clasificar(e);
+        if (intento === 1 || tipo === "error") throw e;
+        console.warn(`Rumbo: ${tarea}, reintento tras ${tipo}`);
+        await esperar(tipo === "cuota" ? 4000 : 500);
+      }
+    }
+    if (!datos) throw new Error("sin datos");
 
     // Normaliza la salida del recomendador al formato del CRM
     if (tarea === "recomendar") {
@@ -180,7 +223,7 @@ ${tarea === "redactar" ? `Tono: ${texto(a.tono, 10) || "cercano"}. Firma: ${text
           .map((x: { productoId: string; puntuacion: number }) => [x.productoId, Math.max(0, Math.min(100, Math.round(Number(x.puntuacion) || 0)))])
       );
       for (const id of ids) afinidad[id] ??= 0;
-      if (!ids.has(datos.productoId)) datos.productoId = Object.entries(afinidad).sort((x, y) => Number(y[1]) - Number(x[1]))[0][0];
+      if (!ids.has(String(datos.productoId))) datos.productoId = Object.entries(afinidad).sort((x, y) => Number(y[1]) - Number(x[1]))[0][0];
       datos.afinidad = afinidad;
     }
 
@@ -188,6 +231,6 @@ ${tarea === "redactar" ? `Tono: ${texto(a.tono, 10) || "cercano"}. Firma: ${text
     return NextResponse.json({ modo: "ia", modelo: MODELO, datos, duracionMs: Date.now() - inicio });
   } catch (error) {
     console.error(`Rumbo: ${tarea} falló, modo reglas:`, motivo(error));
-    return NextResponse.json({ modo: "reglas", motivo: "error" });
+    return NextResponse.json({ modo: "reglas", motivo: clasificar(error) });
   }
 }

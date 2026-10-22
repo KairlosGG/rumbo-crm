@@ -7,7 +7,7 @@ import { Info, Loader2, Radar, Sparkles, X } from "lucide-react";
 import { ejecutarAgentes, prospectar } from "../lib/agentes";
 import { useCRM } from "../lib/store";
 import type { Origen } from "../lib/tipos";
-import { OrigenTag, boton, campo, useEscape } from "./ui";
+import { OrigenTag, boton, campo, useEscape, useFocoDialogo } from "./ui";
 
 const IDEAS = [
   "Cadenas de hostelería en Andalucía de 50 a 250 empleados que siguen fichando en papel",
@@ -42,6 +42,7 @@ export default function Prospector({ abierto, onCerrar }: { abierto: boolean; on
   const creados = resultado ? leads.filter((l) => resultado.ids.includes(l.id)) : [];
 
   useEscape(abierto, cerrar);
+  const dialogo = useFocoDialogo<HTMLDivElement>(abierto);
 
   return (
     <AnimatePresence>
@@ -49,6 +50,7 @@ export default function Prospector({ abierto, onCerrar }: { abierto: boolean; on
         <motion.div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-tinta/30 backdrop-blur-[2px]" onClick={cerrar} />
           <motion.div
+            ref={dialogo}
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-prospector"

@@ -55,6 +55,7 @@ export interface Borrador {
   seguimiento: string;
   estado: EstadoBorrador;
   editado: boolean;
+  aviso?: string; // por qué se usó la versión sin IA
   origen: Origen;
   fecha: string;
 }

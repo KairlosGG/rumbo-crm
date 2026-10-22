@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Sparkles, Cog, User } from "lucide-react";
 import { etapaInfo } from "../lib/catalogo";
 import type { Etapa, Origen, Puntuacion } from "../lib/tipos";
@@ -146,4 +146,34 @@ export function useEscape(activo: boolean, cerrar: () => void) {
     window.addEventListener("keydown", f);
     return () => window.removeEventListener("keydown", f);
   }, [activo, cerrar]);
+}
+
+const ENFOCABLES = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export function useFocoDialogo<T extends HTMLElement>(activo: boolean) {
+  const ref = useRef<T>(null);
+  useEffect(() => {
+    if (!activo) return;
+    const previo = document.activeElement as HTMLElement | null;
+    const raiz = ref.current;
+    const alTabular = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !raiz) return;
+      const els = [...raiz.querySelectorAll<HTMLElement>(ENFOCABLES)].filter((el) => el.offsetParent !== null);
+      if (!els.length) return;
+      const [primero, ultimo] = [els[0], els[els.length - 1]];
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    };
+    window.addEventListener("keydown", alTabular);
+    return () => {
+      window.removeEventListener("keydown", alTabular);
+      previo?.focus?.();
+    };
+  }, [activo]);
+  return ref;
 }

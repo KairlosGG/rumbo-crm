@@ -16,7 +16,18 @@ export const PASOS: { id: Agente; nombre: string; hace: string }[] = [
   { id: "redactor", nombre: "Redactor", hace: "Escribe el primer email" },
 ];
 
-type Respuesta = { modo: Origen; datos?: Record<string, unknown>; modelo?: string; duracionMs?: number };
+type Respuesta = { modo: Origen; datos?: Record<string, unknown>; modelo?: string; duracionMs?: number; motivo?: string };
+
+export const MOTIVOS: Record<string, string> = {
+  "sin-clave": "la IA no está configurada en este despliegue",
+  limite: "has alcanzado el límite de uso de IA de la demo; prueba en unos minutos",
+  cuota: "la cuota gratuita de la IA está al límite; prueba en un minuto",
+  tiempo: "la IA tardó demasiado en responder",
+  error: "la IA no respondió",
+  red: "no hay conexión con el servidor",
+};
+
+const sinIA = (r: Respuesta) => (r.modo === "ia" ? "" : ` · Sin IA: ${MOTIVOS[r.motivo ?? "error"] ?? MOTIVOS.error}`);
 
 async function llamar(tarea: string, lead: Lead, extra: Record<string, unknown> = {}): Promise<Respuesta> {
   const { ajustes } = useCRM.getState();
@@ -40,10 +51,10 @@ async function llamar(tarea: string, lead: Lead, extra: Record<string, unknown> 
         ...extra,
       }),
     });
-    if (!r.ok) return { modo: "reglas" };
+    if (!r.ok) return { modo: "reglas", motivo: "error" };
     return (await r.json()) as Respuesta;
   } catch {
-    return { modo: "reglas" };
+    return { modo: "reglas", motivo: "red" };
   }
 }
 
@@ -83,7 +94,7 @@ export async function investigar(id: string) {
     leadId: id,
     empresa: lead.empresa,
     accion: "Ficha de cuenta y mapa de empatía",
-    detalle: `${inv.dolores.length} hipótesis de dolor, ${inv.preguntas.length} preguntas de descubrimiento`,
+    detalle: `${inv.dolores.length} hipótesis de dolor, ${inv.preguntas.length} preguntas de descubrimiento${sinIA(r)}`,
     modo: inv.origen,
     duracionMs: Math.round(performance.now() - inicio),
   });
@@ -134,7 +145,7 @@ export async function recomendar(id: string) {
     leadId: id,
     empresa: lead.empresa,
     accion: "Recomendación de producto",
-    detalle: `${producto(rec.productoId)?.nombre} (${rec.afinidad[rec.productoId]} % de afinidad)`,
+    detalle: `${producto(rec.productoId)?.nombre} (${rec.afinidad[rec.productoId]} % de afinidad)${sinIA(r)}`,
     modo: rec.origen,
     duracionMs: Math.round(performance.now() - inicio),
   });
@@ -161,13 +172,16 @@ export async function redactar(id: string) {
       fecha: new Date().toISOString(),
     };
   }
-  s.actualizarLead(id, { borrador: { ...borrador, estado: "pendiente", editado: false }, siguientePaso: "Revisar y aprobar el primer email" });
+  s.actualizarLead(id, {
+    borrador: { ...borrador, estado: "pendiente", editado: false, aviso: r.modo === "ia" ? undefined : MOTIVOS[r.motivo ?? "error"] ?? MOTIVOS.error },
+    siguientePaso: "Revisar y aprobar el primer email",
+  });
   s.registrar({
     agente: "redactor",
     leadId: id,
     empresa: lead.empresa,
     accion: "Borrador de primer contacto",
-    detalle: `«${borrador.asunto}» · pendiente de aprobación humana`,
+    detalle: `«${borrador.asunto}» · pendiente de aprobación humana${sinIA(r)}`,
     modo: borrador.origen,
     duracionMs: Math.round(performance.now() - inicio),
   });
@@ -196,6 +210,20 @@ export async function reescribirEmail(id: string) {
 }
 
 const TAMANOS_VALIDOS: Tamano[] = ["1-49", "50-249", "250-999", "1000+"];
+
+const PISTAS: [RegExp, string][] = [
+  [/fich|registro de jornada|papel/i, DOLENCIAS[1]],
+  [/horas extra/i, DOLENCIAS[2]],
+  [/baja|cobertur|sustitu|guardia|última hora/i, DOLENCIAS[3]],
+  [/forma|onboarding|incorpora/i, DOLENCIAS[4]],
+  [/rotaci/i, DOLENCIAS[5]],
+  [/absentismo|datos|indicador/i, DOLENCIAS[6]],
+  [/turno|cuadrante|horario|planific/i, DOLENCIAS[0]],
+];
+
+export function deducirDolencia(texto: string): string {
+  return PISTAS.find(([re]) => re.test(texto))?.[1] ?? DOLENCIAS[DOLENCIAS.length - 1];
+}
 
 // Prospector: propone cuentas FICTICIAS que encajan con un perfil, para practicar el flujo sin datos reales.
 export async function prospectar(peticion: string, cantidad: number): Promise<{ ids: string[]; modo: Origen }> {
@@ -227,7 +255,7 @@ export async function prospectar(peticion: string, cantidad: number): Promise<{ 
           ciudad: String(e.ciudad ?? "").slice(0, 40),
           contacto: { nombre, cargo: String(e.cargo ?? "").slice(0, 60), email: `${(n ?? "contacto").replace(/[^a-z]/g, "")}.${(a ?? "").replace(/[^a-z]/g, "")}@${slug}.example` },
           necesidad: String(e.necesidad ?? "").slice(0, 300),
-          dolencia: DOLENCIAS[0],
+          dolencia: deducirDolencia(String(e.necesidad ?? "")),
           notas: "Cuenta ficticia propuesta por el agente prospector",
           valor: Math.max(500, Math.min(90000, Math.round(Number(e.valor) || 10000))),
           origenLead: "prospector",

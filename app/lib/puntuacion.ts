@@ -63,7 +63,7 @@ export function probabilidadCierre(lead: Lead, ajustes: Ajustes): Probabilidad {
   if (lead.etapa === "ganado") return { valor: 100, factores: [{ etiqueta: "Ganado", efecto: 100 }] };
   if (lead.etapa === "perdido") return { valor: 0, factores: [{ etiqueta: "Perdido", efecto: 0 }] };
   const base = { nuevo: 8, contactado: 15, cualificado: 30, propuesta: 50 }[lead.etapa];
-  const factores: { etiqueta: string; efecto: number }[] = [{ etiqueta: `Base de la etapa ${lead.etapa}`, efecto: base }];
+  const factores: { etiqueta: string; efecto: number }[] = [{ etiqueta: `Base de la etapa ${ETAPAS.find((e) => e.id === lead.etapa)?.nombre ?? lead.etapa}`, efecto: base }];
   const p = puntuar(lead, ajustes);
   const porEncaje = Math.max(-15, Math.min(15, Math.round((p.total - 60) / 2)));
   if (porEncaje) factores.push({ etiqueta: porEncaje > 0 ? "Encaje alto con el cliente ideal" : "Encaje bajo con el cliente ideal", efecto: porEncaje });

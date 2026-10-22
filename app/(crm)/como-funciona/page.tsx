@@ -191,6 +191,23 @@ export default function ComoFunciona() {
           </div>
         </div>
       </Tarjeta>
+      <Tarjeta className="p-5">
+        <h2 className="font-extrabold">Datos y privacidad en esta demo</h2>
+        <ul className="mt-3 space-y-2 text-sm leading-relaxed text-suave">
+          <li>
+            <span className="font-bold text-tinta">Dónde se guardan.</span> Leads, ajustes y registro viven solo en tu navegador. No hay base de datos ni cuentas de usuario: el selector «Entrar como» simula los roles.
+          </li>
+          <li>
+            <span className="font-bold text-tinta">Qué se envía a la IA.</span> Cuando ejecutas un agente, el servidor manda a Gemini los datos de ese lead (empresa, sector, tamaño, cargo, necesidad y notas) y la configuración comercial. No se envía nada más.
+          </li>
+          <li>
+            <span className="font-bold text-tinta">Solo datos ficticios.</span> La demo usa el nivel gratuito de Gemini, en el que Google puede usar el contenido para mejorar sus productos. No introduzcas datos de personas o empresas reales.
+          </li>
+          <li>
+            <span className="font-bold text-tinta">Nada sale hacia fuera.</span> No se envía ningún email: aprobar un borrador solo lo registra.
+          </li>
+        </ul>
+      </Tarjeta>
     </div>
   );
 }

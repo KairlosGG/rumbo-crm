@@ -119,6 +119,12 @@ function Email({ lead }: { lead: Lead }) {
         </span>
       </div>
 
+      {b.origen === "reglas" && b.aviso && pendiente && (
+        <p className="mt-3 rounded-xl bg-ambar-clara px-3 py-2 text-xs font-semibold text-ambar">
+          Borrador hecho con reglas porque {b.aviso}. Pulsa «Reescribir» para intentarlo de nuevo con IA.
+        </p>
+      )}
+
       <label className="mt-4 block">
         <span className="mb-1 block text-xs font-bold text-suave">Asunto</span>
         <input className={campo} value={b.asunto} onChange={(e) => editar("asunto", e.target.value)} disabled={!pendiente} />
@@ -391,7 +397,8 @@ export default function FichaLead({ params }: { params: Promise<{ id: string }> 
               ))}
             </ul>
             <p className="mt-2 text-xs text-suave">
-              Previsión ponderada: <span className="cifras font-bold text-tinta">{euros((lead.valor * prob.valor) / 100)}</span>
+              Previsión ponderada:{" "}
+              <span className="cifras font-bold text-tinta">{lead.valor ? euros((lead.valor * prob.valor) / 100) : "sin valor estimado"}</span>
             </p>
           </Tarjeta>
 
@@ -474,7 +481,22 @@ export default function FichaLead({ params }: { params: Promise<{ id: string }> 
               </div>
               <div>
                 <dt className="text-xs font-bold text-tenue">Valor estimado</dt>
-                <dd className="cifras mt-0.5 font-bold">{euros(lead.valor)} al año</dd>
+                <dd className="mt-1">
+                  <label htmlFor="valor" className="sr-only">
+                    Valor estimado al año
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="valor"
+                      inputMode="numeric"
+                      className={`${campoBase} cifras w-32 font-bold`}
+                      value={lead.valor || ""}
+                      placeholder="Sin estimar"
+                      onChange={(e) => actualizar(lead.id, { valor: Math.max(0, Number(e.target.value.replace(/\D/g, "")) || 0) })}
+                    />
+                    <span className="text-sm text-suave">€ al año</span>
+                  </div>
+                </dd>
               </div>
               <div>
                 <label htmlFor="dolencia" className="text-xs font-bold text-tenue">
