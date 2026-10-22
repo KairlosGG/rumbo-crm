@@ -2,7 +2,7 @@
 
 CRM B2B en el que cinco agentes trabajan cada oportunidad (buscan cuentas, las investigan, puntúan el encaje, recomiendan producto y redactan el primer email) y una persona decide qué sale hacia el cliente. Cada acción, de un agente o de una persona, queda registrada.
 
-**Demo:** https://rumbo-crm.vercel.app
+**Demo:** https://rumbo-crm-omega.vercel.app
 
 > Es una demo con una empresa y datos ficticios: Brisa Software, que vende software de gestión de personal. Las empresas, personas y correos son inventados y los dominios usan `.example`, reservado y sin dueño. No se envía ningún email.
 
