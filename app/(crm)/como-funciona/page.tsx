@@ -201,7 +201,7 @@ export default function ComoFunciona() {
             <span className="font-bold text-tinta">Qué se envía a la IA.</span> Cuando ejecutas un agente, el servidor manda a Gemini los datos de ese lead (empresa, sector, tamaño, cargo, necesidad y notas) y la configuración comercial. No se envía nada más.
           </li>
           <li>
-            <span className="font-bold text-tinta">Solo datos ficticios.</span> La demo usa el nivel gratuito de Gemini, en el que Google puede usar el contenido para mejorar sus productos. No introduzcas datos de personas o empresas reales.
+            <span className="font-bold text-tinta">Solo datos ficticios.</span> Es una demo pública sin contrato de tratamiento de datos con el proveedor de IA. No introduzcas datos de personas o empresas reales.
           </li>
           <li>
             <span className="font-bold text-tinta">Nada sale hacia fuera.</span> No se envía ningún email: aprobar un borrador solo lo registra.

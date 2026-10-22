@@ -26,7 +26,7 @@ En prospección B2B, el comercial pierde la mayor parte del tiempo antes de habl
 - Cabeceras de seguridad en todas las páginas (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`).
 - Aviso de posible duplicado al crear un lead de una empresa que ya existe.
 - Diálogos accesibles: el foco queda dentro, se cierran con Escape y lo devuelven al botón que los abrió.
-- La página «Cómo funciona» explica qué datos salen hacia la IA. La demo usa el nivel gratuito de Gemini, así que solo admite datos ficticios.
+- La página «Cómo funciona» explica qué datos salen hacia la IA. Es una demo pública sin contrato de tratamiento de datos con el proveedor de IA, así que solo admite datos ficticios.
 
 ## Funcionalidades
 
